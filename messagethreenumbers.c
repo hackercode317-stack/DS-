@@ -1,81 +1,110 @@
+Slip 26:- 
+  
 Ds)  2) 
 #include<stdio.h> 
+#include<stdlib.h> 
+ 
+struct node 
+{     int data;     struct node *left,*right; 
+}; 
+ 
+/* create BST */ struct node* create(struct node *T,int x) 
+{ 
+    struct node *nw; 
+ 
+    if(T==NULL) 
+    { 
+        nw=(struct node*)malloc(sizeof(struct node));         nw->data=x;         nw->left=nw->right=NULL;         return nw; 
+    } 
+ 
+    if(x < T->data)         T->left=create(T->left,x);     else 
+        T->right=create(T->right,x); 
+ 
+    return T; 
+} 
+ 
+/* find minimum */ int findMin(struct node *T) 
+{ 
+    while(T->left!=NULL) 
+        T=T->left; 
+ 
+    return T->data; 
+} 
+ 
+/* find maximum */ int findMax(struct node *T) 
+{ 
+    while(T->right!=NULL) 
+        T=T->right; 
+ 
+    return T->data; 
+} 
  
 int main() 
-{     int n,i,j; 
-    int adj[10][10]; 
+{ 
+    struct node *T=NULL; 
+    int n,i,x; 
  
-    printf("Enter number of vertices: ");     scanf("%d",&n); 
- 
-    /* Initialize matrix with 0 */     for(i=0;i<n;i++) 
-    { 
-        for(j=0;j<n;j++) 
-        {             adj[i][j]=0; 
-        } 
-    } 
- 
-    /* Accept edges */     for(i=0;i<n;i++) 
-    { 
-        for(j=0;j<n;j++) 
-        {             if(i!=j) 
-            { 
-                printf("Is there an edge between %d and %d (1/0): ",i+1,j+1);                 scanf("%d",&adj[i][j]); 
-            } 
-        } 
-    } 
- 
-    /* Display adjacency matrix */     printf("\nAdjacency Matrix:\n"); 
+    printf("Enter number of nodes: ");     scanf("%d",&n); 
  
     for(i=0;i<n;i++) 
     { 
-        for(j=0;j<n;j++) 
-        { 
-            printf("%d ",adj[i][j]); 
-        } 
-        printf("\n"); 
+        printf("Enter value: ");         scanf("%d",&x); 
+        T=create(T,x); 
     } 
+ 
+    printf("Minimum value = %d\n",findMin(T));     printf("Maximum value = %d\n",findMax(T)); 
  
     return 0; 
 } 
  
-DBMS:-  
-CREATE TABLE Project (     pno INTEGER PRIMARY KEY,     pname CHAR(30) NOT NULL,     ptype CHAR(20),     duration INTEGER CHECK (duration > 0) 
+DBMS:- 
+CREATE TABLE Item (     itemno INTEGER PRIMARY KEY,     itemname VARCHAR(20),     quantity INTEGER 
+); 
+CREATE TABLE Supplier (     supplierno INTEGER PRIMARY KEY,     supplier_name VARCHAR(20),     city VARCHAR(20) 
 ); 
  
-CREATE TABLE Employee (     eno INTEGER PRIMARY KEY,     ename CHAR(20),     qualification CHAR(15),     joining_date DATE 
+CREATE TABLE Item_Supplier (     itemno INTEGER REFERENCES Item(itemno),     supplierno INTEGER REFERENCES Supplier(supplierno),     rate MONEY, 
+    PRIMARY KEY(itemno, supplierno) 
 ); 
  
-CREATE TABLE Project_Employee (     pno INTEGER REFERENCES Project(pno),     eno INTEGER REFERENCES Employee(eno),     start_date DATE, 
-    no_of_hours_worked INTEGER, 
-    PRIMARY KEY (pno, eno) 
-); 
- 
-1A) 
-CREATE OR REPLACE FUNCTION count_projects(emp_no INT) RETURNS INTEGER LANGUAGE plpgsql AS $$ DECLARE 
-    proj_count INTEGER; 
+1B) 
+CREATE OR REPLACE FUNCTION check_rate_difference() 
+RETURNS TRIGGER 
+AS $$ 
 BEGIN 
  
-    SELECT COUNT(*) INTO proj_count 
-    FROM Project_Employee 
-    WHERE eno = emp_no; 
+    IF ABS(NEW.rate - OLD.rate) > 2000 THEN 
+        RAISE EXCEPTION 'Rate difference cannot exceed Rs 2000'; 
+    END IF; 
  
-    RETURN proj_count; 
+    RETURN NEW; 
  
 END; 
-$$; 
+$$ LANGUAGE plpgsql; 
+ 
+CREATE TRIGGER trg_rate_update 
+BEFORE UPDATE 
+ON Item_Supplier 
+FOR EACH ROW 
+EXECUTE FUNCTION check_rate_difference(); 
+ 
  
 2) 
-CREATE OR REPLACE PROCEDURE calc_numbers(a INT, b INT, c INT) LANGUAGE plpgsql AS $$ DECLARE 
-    sum_val INT;     sub_val INT;     mul_val INT; 
+CREATE OR REPLACE PROCEDURE subtract_three(a INT, b INT, c INT) 
+LANGUAGE plpgsql 
+AS $$ DECLARE 
+    result INT; 
 BEGIN 
  
-    sum_val := a + b + c;     sub_val := a - b - c;     mul_val := a * b * c; 
+    result := a - b - c; 
  
-    RAISE NOTICE 'Addition = %', sum_val; 
-    RAISE NOTICE 'Subtraction = %', sub_val; 
-    RAISE NOTICE 'Multiplication = %', mul_val; 
+    RAISE NOTICE 'Result = %', result; 
  
 END; 
 $$; 
+ 
+ 
+ 
+ 
  
  

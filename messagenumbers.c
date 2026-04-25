@@ -1,96 +1,44 @@
-Slip 19:- 
-  
-Ds)  1) 
+Ds)  2) 
 #include<stdio.h> 
-#include<stdlib.h> 
-#include<string.h> 
- 
-struct node 
-{ 
-    char name[30];     char phone[15];     struct node *left,*right; 
-}; 
- 
-/* create node in BST */ 
-struct node* create(struct node *T, char name[], char phone[]) 
-{ 
-    struct node *nw; 
- 
-    if(T==NULL) 
-    { 
-        nw=(struct node*)malloc(sizeof(struct node));         strcpy(nw->name,name);         strcpy(nw->phone,phone);         nw->left=nw->right=NULL; 
-        return nw; 
-    } 
- 
-    if(strcmp(name,T->name) < 0)         T->left=create(T->left,name,phone); 
-    else 
-        T->right=create(T->right,name,phone); 
- 
-    return T; 
-} 
- 
-/* search contact */ void search(struct node *T,char name[]) 
-{ 
-    if(T==NULL) 
-    { 
-        printf("Contact not found\n"); 
-        return; 
-    } 
- 
-    if(strcmp(name,T->name)==0) 
-    { 
-        printf("Name: %s\nPhone: %s\n",T->name,T->phone); 
-        return; 
-    } 
- 
-    if(strcmp(name,T->name)<0)         search(T->left,name); 
-    else 
-        search(T->right,name); 
-} 
- 
-/* display phonebook */ void inorder(struct node *T) 
-{ 
-    if(T!=NULL) 
-    { 
-        inorder(T->left); 
-        printf("%s : %s\n",T->name,T->phone);         inorder(T->right); 
-    } 
-} 
  
 int main() 
-{ 
-    struct node *T=NULL; 
-    int ch; 
-    char name[30],phone[15]; 
+{     int n,i,j; 
+    int adj[10][10]; 
  
-    while(1) 
+    printf("Enter number of vertices: ");     scanf("%d",&n); 
+ 
+    /* Initialize matrix with 0 */     for(i=0;i<n;i++) 
     { 
-        printf("\n1.Add Contact"); 
-        printf("\n2.Search Contact");         printf("\n3.Display Phonebook");         printf("\n4.Exit"); 
- 
-        printf("\nEnter choice: ");         scanf("%d",&ch); 
- 
-        switch(ch) 
-        {             case 1: 
-                printf("Enter name: ");                 scanf("%s",name); 
- 
-                printf("Enter phone: ");                 scanf("%s",phone); 
- 
-                T=create(T,name,phone); 
-                break; 
- 
-            case 2: 
-                printf("Enter name to search: ");                 scanf("%s",name);                 search(T,name);                 break; 
-             case 3: 
-                printf("\nPhonebook:\n"); 
-                inorder(T);                 break; 
-             case 4:                 return 0; 
- 
-            default: 
-                printf("Invalid choice\n"); 
+        for(j=0;j<n;j++) 
+        {             adj[i][j]=0; 
         } 
     } 
+ 
+    /* Accept edges */     for(i=0;i<n;i++) 
+    { 
+        for(j=0;j<n;j++) 
+        {             if(i!=j) 
+            { 
+                printf("Is there an edge between %d and %d (1/0): ",i+1,j+1);                 scanf("%d",&adj[i][j]); 
+            } 
+        } 
+    } 
+ 
+    /* Display adjacency matrix */     printf("\nAdjacency Matrix:\n"); 
+ 
+    for(i=0;i<n;i++) 
+    { 
+        for(j=0;j<n;j++) 
+        { 
+            printf("%d ",adj[i][j]); 
+        } 
+        printf("\n"); 
+    } 
+ 
+    return 0; 
 } 
-DBMS:- 
+ 
+DBMS:-  
 CREATE TABLE Project (     pno INTEGER PRIMARY KEY,     pname CHAR(30) NOT NULL,     ptype CHAR(20),     duration INTEGER CHECK (duration > 0) 
 ); 
  
@@ -102,54 +50,32 @@ CREATE TABLE Project_Employee (     pno INTEGER REFERENCES Project(pno),     eno
     PRIMARY KEY (pno, eno) 
 ); 
  
- 
 1A) 
-CREATE OR REPLACE FUNCTION count_projects(emp_no INT) 
-RETURNS INT 
-LANGUAGE plpgsql 
-AS $$ DECLARE 
-    total INT; 
+CREATE OR REPLACE FUNCTION count_projects(emp_no INT) RETURNS INTEGER LANGUAGE plpgsql AS $$ DECLARE 
+    proj_count INTEGER; 
 BEGIN 
  
-    SELECT COUNT(*) 
-    INTO total 
+    SELECT COUNT(*) INTO proj_count 
     FROM Project_Employee 
     WHERE eno = emp_no; 
  
-    RETURN total; 
+    RETURN proj_count; 
  
 END; 
 $$; 
+ 
 2) 
-CREATE OR REPLACE PROCEDURE min_max(a INT, b INT) 
-LANGUAGE plpgsql 
-AS $$ DECLARE 
-    min_val INT;     max_val INT; 
+CREATE OR REPLACE PROCEDURE calc_numbers(a INT, b INT, c INT) LANGUAGE plpgsql AS $$ DECLARE 
+    sum_val INT;     sub_val INT;     mul_val INT; 
 BEGIN 
  
-    IF a < b THEN         min_val := a;         max_val := b; 
-    ELSE 
-        min_val := b;         max_val := a; 
-    END IF; 
+    sum_val := a + b + c;     sub_val := a - b - c;     mul_val := a * b * c; 
  
-    RAISE NOTICE 'Minimum = %', min_val; 
-    RAISE NOTICE 'Maximum = %', max_val; 
+    RAISE NOTICE 'Addition = %', sum_val; 
+    RAISE NOTICE 'Subtraction = %', sub_val; 
+    RAISE NOTICE 'Multiplication = %', mul_val; 
  
 END; 
 $$; 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
  
  
